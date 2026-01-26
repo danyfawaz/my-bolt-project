@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TaskList from './components/TaskList';
 import TaskDetail from './components/TaskDetail';
 import { WebSocketProvider } from './providers/WebSocketProvider';
+import { NotificationBell } from './components/NotificationBell';
+import { NotificationPanel } from './components/NotificationPanel';
 import { ClipboardList } from 'lucide-react';
 
 function App() {
+  const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
+
   return (
     <WebSocketProvider>
       <Router>
@@ -19,6 +23,9 @@ function App() {
                     <span className="ml-2 text-xl font-bold text-gray-900">Marketing Tasks</span>
                   </div>
                 </div>
+                <div className="flex items-center">
+                  <NotificationBell onClick={() => setIsNotificationPanelOpen(!isNotificationPanelOpen)} />
+                </div>
               </div>
             </div>
           </nav>
@@ -30,6 +37,11 @@ function App() {
             </Routes>
           </main>
         </div>
+
+        <NotificationPanel
+          isOpen={isNotificationPanelOpen}
+          onClose={() => setIsNotificationPanelOpen(false)}
+        />
       </Router>
     </WebSocketProvider>
   );
