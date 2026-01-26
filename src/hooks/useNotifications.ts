@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useWebSocket } from './useWebSocket';
 import { supabase } from '../lib/supabase';
-import type { Notification } from '../types/notification';
+import type { Notification, NotificationState } from '../types/notification';
 
 interface PostgresChangePayload {
   eventType: 'INSERT' | 'UPDATE' | 'DELETE';
@@ -85,7 +85,7 @@ export function useNotifications() {
 
       const { error } = await supabase
         .from('notifications')
-        .update({ state: 'read', updated_at: new Date().toISOString() })
+        .update({ state: 'read' as NotificationState, updated_at: new Date().toISOString() })
         .eq('id', notificationId)
         .eq('recipient_id', user.id);
 
@@ -96,12 +96,46 @@ export function useNotifications() {
     [user]
   );
 
+  const markAsActioned = useCallback(
+    async (notificationId: string) => {
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('notifications')
+        .update({ state: 'actioned' as NotificationState, updated_at: new Date().toISOString() })
+        .eq('id', notificationId)
+        .eq('recipient_id', user.id);
+
+      if (error) {
+        console.error('Error marking notification as actioned:', error);
+      }
+    },
+    [user]
+  );
+
+  const archive = useCallback(
+    async (notificationId: string) => {
+      if (!user) return;
+
+      const { error } = await supabase
+        .from('notifications')
+        .update({ state: 'archived' as NotificationState, updated_at: new Date().toISOString() })
+        .eq('id', notificationId)
+        .eq('recipient_id', user.id);
+
+      if (error) {
+        console.error('Error archiving notification:', error);
+      }
+    },
+    [user]
+  );
+
   const markAllAsRead = useCallback(async () => {
     if (!user) return;
 
     const { error } = await supabase
       .from('notifications')
-      .update({ state: 'read', updated_at: new Date().toISOString() })
+      .update({ state: 'read' as NotificationState, updated_at: new Date().toISOString() })
       .eq('recipient_id', user.id)
       .eq('state', 'unread');
 
@@ -115,6 +149,8 @@ export function useNotifications() {
     unreadCount,
     loading,
     markAsRead,
+    markAsActioned,
+    archive,
     markAllAsRead,
   };
 }
