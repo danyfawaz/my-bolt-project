@@ -2,6 +2,16 @@ import { useEffect, useState, useCallback } from 'react';
 import { useWebSocket } from './useWebSocket';
 import { supabase } from '../lib/supabase';
 import type { Notification, NotificationState } from '../types/notification';
+import { mockNotifications, getMockUnreadCount } from '../mocks/notifications';
+
+// Enable demo mode when no user is authenticated or via URL param ?demo=true
+const isDemoMode = () => {
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('demo') === 'true';
+  }
+  return false;
+};
 
 interface PostgresChangePayload {
   eventType: 'INSERT' | 'UPDATE' | 'DELETE';
@@ -14,10 +24,23 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [demoMode] = useState(isDemoMode);
 
-  // Fetch initial notifications
+  // Fetch initial notifications (or use mock data in demo mode)
   useEffect(() => {
-    if (!user) {
+    // Demo mode - use mock data
+    if (demoMode || !user) {
+      if (demoMode) {
+        // Simulate loading delay for realistic UX
+        setLoading(true);
+        const timer = setTimeout(() => {
+          setNotifications([...mockNotifications]);
+          setUnreadCount(getMockUnreadCount());
+          setLoading(false);
+        }, 800);
+        return () => clearTimeout(timer);
+      }
+
       setNotifications([]);
       setUnreadCount(0);
       setLoading(false);
@@ -43,7 +66,7 @@ export function useNotifications() {
     };
 
     fetchNotifications();
-  }, [user]);
+  }, [user, demoMode]);
 
   // Subscribe to realtime notification updates
   useEffect(() => {
@@ -81,6 +104,19 @@ export function useNotifications() {
 
   const markAsRead = useCallback(
     async (notificationId: string) => {
+      // Demo mode - update local state only
+      if (demoMode) {
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notificationId
+              ? { ...n, state: 'read' as NotificationState, updated_at: new Date().toISOString() }
+              : n
+          )
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+        return;
+      }
+
       if (!user) return;
 
       const { error } = await supabase
@@ -93,11 +129,23 @@ export function useNotifications() {
         console.error('Error marking notification as read:', error);
       }
     },
-    [user]
+    [user, demoMode]
   );
 
   const markAsActioned = useCallback(
     async (notificationId: string) => {
+      // Demo mode - update local state only
+      if (demoMode) {
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notificationId
+              ? { ...n, state: 'actioned' as NotificationState, updated_at: new Date().toISOString() }
+              : n
+          )
+        );
+        return;
+      }
+
       if (!user) return;
 
       const { error } = await supabase
@@ -110,11 +158,27 @@ export function useNotifications() {
         console.error('Error marking notification as actioned:', error);
       }
     },
-    [user]
+    [user, demoMode]
   );
 
   const archive = useCallback(
     async (notificationId: string) => {
+      // Demo mode - update local state only
+      if (demoMode) {
+        const notification = notifications.find((n) => n.id === notificationId);
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notificationId
+              ? { ...n, state: 'archived' as NotificationState, updated_at: new Date().toISOString() }
+              : n
+          )
+        );
+        if (notification?.state === 'unread') {
+          setUnreadCount((prev) => Math.max(0, prev - 1));
+        }
+        return;
+      }
+
       if (!user) return;
 
       const { error } = await supabase
@@ -127,10 +191,23 @@ export function useNotifications() {
         console.error('Error archiving notification:', error);
       }
     },
-    [user]
+    [user, demoMode, notifications]
   );
 
   const markAllAsRead = useCallback(async () => {
+    // Demo mode - update local state only
+    if (demoMode) {
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.state === 'unread'
+            ? { ...n, state: 'read' as NotificationState, updated_at: new Date().toISOString() }
+            : n
+        )
+      );
+      setUnreadCount(0);
+      return;
+    }
+
     if (!user) return;
 
     const { error } = await supabase
@@ -142,7 +219,7 @@ export function useNotifications() {
     if (error) {
       console.error('Error marking all notifications as read:', error);
     }
-  }, [user]);
+  }, [user, demoMode]);
 
   return {
     notifications,
