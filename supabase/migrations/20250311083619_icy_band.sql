@@ -19,7 +19,7 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO tasks (id, title, description, assignee_id, approver_id, status, created_at)
 VALUES
   (
-    'task-001',
+    'a0000000-0000-0000-0000-000000000001',
     'Google Ads Summer Campaign',
     'Create a comprehensive Google Ads campaign for our summer collection launch',
     'd0d7d63a-5e4b-4ec0-9ef6-19585532bd03',
@@ -28,7 +28,7 @@ VALUES
     now() - interval '2 days'
   ),
   (
-    'task-002',
+    'a0000000-0000-0000-0000-000000000002',
     'Social Media Content Calendar',
     'Develop next month''s social media content calendar focusing on product features',
     'd0d7d63a-5e4b-4ec0-9ef6-19585532bd03',
@@ -41,8 +41,8 @@ VALUES
 INSERT INTO deliverables (id, task_id, title, description, assignee_id, approver_id, status, created_at)
 VALUES
   (
-    'del-001',
-    'task-001',
+    'b0000000-0000-0000-0000-000000000001',
+    'a0000000-0000-0000-0000-000000000001',
     'Display Ad Designs',
     'Create display ad designs in all required sizes (300x250, 728x90, 160x600)',
     'd0d7d63a-5e4b-4ec0-9ef6-19585532bd03',
@@ -51,8 +51,8 @@ VALUES
     now() - interval '1 day'
   ),
   (
-    'del-002',
-    'task-001',
+    'b0000000-0000-0000-0000-000000000002',
+    'a0000000-0000-0000-0000-000000000001',
     'Ad Copy and Keywords',
     'Write compelling ad copy and research targeted keywords for the campaign',
     'd0d7d63a-5e4b-4ec0-9ef6-19585532bd03',
@@ -65,8 +65,8 @@ VALUES
 INSERT INTO deliverables (id, task_id, title, description, assignee_id, approver_id, status, created_at)
 VALUES
   (
-    'del-003',
-    'task-002',
+    'b0000000-0000-0000-0000-000000000003',
+    'a0000000-0000-0000-0000-000000000002',
     'Content Strategy Document',
     'Create a detailed content strategy including themes, hashtags, and posting schedule',
     'd0d7d63a-5e4b-4ec0-9ef6-19585532bd03',
@@ -75,8 +75,8 @@ VALUES
     now()
   ),
   (
-    'del-004',
-    'task-002',
+    'b0000000-0000-0000-0000-000000000004',
+    'a0000000-0000-0000-0000-000000000002',
     'Visual Content Creation',
     'Design social media graphics and prepare product photography',
     'd0d7d63a-5e4b-4ec0-9ef6-19585532bd03',
@@ -89,8 +89,8 @@ VALUES
 INSERT INTO deliverable_revisions (id, deliverable_id, submitted_by, content_url, attachment_url, status, created_at)
 VALUES
   (
-    'rev-001',
-    'del-001',
+    'c0000000-0000-0000-0000-000000000001',
+    'b0000000-0000-0000-0000-000000000001',
     'd0d7d63a-5e4b-4ec0-9ef6-19585532bd03',
     'https://www.figma.com/file/sample-display-ads',
     'https://example.com/sample-ads.zip',

@@ -2,16 +2,21 @@ import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TaskList from './components/TaskList';
 import TaskDetail from './components/TaskDetail';
+import NotificationSettings from './pages/settings/NotificationSettings';
+import TestNotifications from './pages/TestNotifications';
 import { WebSocketProvider } from './providers/WebSocketProvider';
 import { NotificationBell } from './components/NotificationBell';
 import { NotificationPanel } from './components/NotificationPanel';
 import { ThemeToggle } from './components/ThemeToggle';
-import { ClipboardList } from 'lucide-react';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { AuthPanel } from './components/AuthPanel';
+import { ClipboardList, Settings } from 'lucide-react';
 
 function App() {
   const [isNotificationPanelOpen, setIsNotificationPanelOpen] = useState(false);
 
   return (
+    <ErrorBoundary>
     <WebSocketProvider>
       <Router>
         <div className="min-h-screen bg-surface-50 dark:bg-surface-950 transition-colors duration-200">
@@ -24,7 +29,14 @@ function App() {
                     <span className="ml-2 text-xl font-bold text-surface-900 dark:text-surface-50">Grower Platform</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
+                  <a
+                    href="/settings/notifications"
+                    className="p-2 text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200 transition-colors"
+                    title="Notification Settings"
+                  >
+                    <Settings className="h-5 w-5" />
+                  </a>
                   <ThemeToggle />
                   <NotificationBell onClick={() => setIsNotificationPanelOpen(!isNotificationPanelOpen)} />
                 </div>
@@ -36,6 +48,8 @@ function App() {
             <Routes>
               <Route path="/" element={<TaskList />} />
               <Route path="/task/:id" element={<TaskDetail />} />
+              <Route path="/settings/notifications" element={<NotificationSettings />} />
+              <Route path="/test-notifications" element={<TestNotifications />} />
             </Routes>
           </main>
         </div>
@@ -46,6 +60,7 @@ function App() {
         />
       </Router>
     </WebSocketProvider>
+    </ErrorBoundary>
   );
 }
 

@@ -10,7 +10,7 @@ import {
   XCircle,
   Archive,
   Check,
-  MoreHorizontal,
+  Circle,
 } from 'lucide-react';
 import type { Notification } from '../types/notification';
 import { NotificationEventType } from '../types/notification';
@@ -19,6 +19,7 @@ import { timeAgo } from '../utils/timeAgo';
 interface NotificationItemProps {
   notification: Notification;
   onMarkAsRead: (id: string) => void;
+  onMarkAsUnread: (id: string) => void;
   onArchive: (id: string) => void;
   onClick: (notification: Notification) => void;
   isLast?: boolean;
@@ -120,6 +121,7 @@ const defaultConfig: EventConfig = {
 export function NotificationItem({
   notification,
   onMarkAsRead,
+  onMarkAsUnread,
   onArchive,
   onClick,
   isLast = false,
@@ -151,6 +153,15 @@ export function NotificationItem({
       setShowActions(false);
     },
     [onMarkAsRead, notification.id]
+  );
+
+  const handleMarkAsUnread = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onMarkAsUnread(notification.id);
+      setShowActions(false);
+    },
+    [onMarkAsUnread, notification.id]
   );
 
   const handleArchive = useCallback(
@@ -252,7 +263,7 @@ export function NotificationItem({
           transition-all duration-200
           ${showActions ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'}
         `}>
-          {isUnread && (
+          {isUnread ? (
             <button
               onClick={handleMarkAsRead}
               className="
@@ -265,6 +276,20 @@ export function NotificationItem({
               title="Mark as read"
             >
               <Check className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleMarkAsUnread}
+              className="
+                p-1.5 rounded-lg
+                text-surface-400 dark:text-surface-500
+                hover:text-amber-600 dark:hover:text-amber-400
+                hover:bg-amber-500/10 dark:hover:bg-amber-500/20
+                transition-colors duration-150
+              "
+              title="Mark as unread"
+            >
+              <Circle className="h-4 w-4" />
             </button>
           )}
           <button

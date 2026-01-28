@@ -1,0 +1,15 @@
+{
+  "id": "2062ace4-e6f0-4777-8874-e18fd9466c5a",
+  "status": "completed",
+  "startedAt": "2026-01-28T08:14:04.079Z",
+  "updatedAt": "2026-01-28T08:14:18.025Z",
+  "agentPlugin": "claude",
+  "trackerPlugin": "json",
+  "prdPath": "/Users/macuser/prd.json",
+  "currentIteration": 0,
+  "maxIterations": 10,
+  "totalTasks": 0,
+  "tasksCompleted": 0,
+  "cwd": "/Users/macuser/my-bolt-project",
+  "endedAt": "2026-01-28T08:14:18.025Z"
+}

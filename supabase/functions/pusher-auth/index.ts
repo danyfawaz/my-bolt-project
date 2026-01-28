@@ -1,11 +1,39 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
 import { createHmac } from 'node:crypto';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+/**
+ * Allowed origins for CORS
+ * In production, this should be configured via environment variables
+ */
+const ALLOWED_ORIGINS = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+];
+
+// Add production origins from environment variable if available
+const prodOrigins = Deno.env.get('CORS_ALLOWED_ORIGINS');
+if (prodOrigins) {
+  ALLOWED_ORIGINS.push(...prodOrigins.split(',').map(o => o.trim()));
+}
+
+/**
+ * Get CORS headers for the given origin
+ * Returns appropriate headers only for allowed origins
+ */
+function getCorsHeaders(requestOrigin: string | null): Record<string, string> {
+  const origin = requestOrigin && ALLOWED_ORIGINS.includes(requestOrigin)
+    ? requestOrigin
+    : ALLOWED_ORIGINS[0]; // Default to first allowed origin
+
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Credentials': 'true',
+  };
+}
 
 interface PusherAuthRequest {
   socket_id: string;
@@ -62,6 +90,10 @@ function extractUserIdFromChannel(channelName: string): string | null {
 }
 
 Deno.serve(async (req) => {
+  // Get request origin for CORS
+  const requestOrigin = req.headers.get('origin');
+  const corsHeaders = getCorsHeaders(requestOrigin);
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });

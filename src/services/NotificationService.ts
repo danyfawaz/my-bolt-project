@@ -178,6 +178,13 @@ export class NotificationService {
   }
 
   /**
+   * Mark a notification as unread
+   */
+  static async markAsUnread(id: string): Promise<Notification | null> {
+    return this.update(id, { state: 'unread' });
+  }
+
+  /**
    * Mark a notification as actioned (user took action on the notification)
    */
   static async markAsActioned(id: string): Promise<Notification | null> {

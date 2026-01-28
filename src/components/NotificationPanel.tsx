@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useRef, useMemo } from 'react';
 import { X, Bell, CheckCheck, Inbox, Settings } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
@@ -50,6 +50,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
     unreadCount,
     loading,
     markAsRead,
+    markAsUnread,
     archive,
     markAllAsRead,
   } = useNotifications();
@@ -227,6 +228,7 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
                         key={notification.id}
                         notification={notification}
                         onMarkAsRead={markAsRead}
+                        onMarkAsUnread={markAsUnread}
                         onArchive={archive}
                         onClick={handleNotificationClick}
                         isLast={index === group.notifications.length - 1}
@@ -240,29 +242,31 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
         </div>
 
         {/* Footer */}
-        {visibleNotifications.length > 0 && (
-          <div className="
-            px-5 py-3
-            border-t border-surface-200/80 dark:border-surface-700/50
-            bg-surface-50/50 dark:bg-surface-900/50
-          ">
-            <div className="flex items-center justify-between">
-              <p className="text-xs text-surface-500 dark:text-surface-400">
-                {visibleNotifications.length} notification{visibleNotifications.length !== 1 ? 's' : ''}
-              </p>
-              <button className="
+        <div className="
+          px-5 py-3
+          border-t border-surface-200/80 dark:border-surface-700/50
+          bg-surface-50/50 dark:bg-surface-900/50
+        ">
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-surface-500 dark:text-surface-400">
+              {visibleNotifications.length} notification{visibleNotifications.length !== 1 ? 's' : ''}
+            </p>
+            <Link
+              to="/settings/notifications"
+              onClick={onClose}
+              className="
                 flex items-center gap-1.5 px-2 py-1 rounded-md
                 text-xs text-surface-500 dark:text-surface-400
                 hover:text-surface-700 dark:hover:text-surface-200
                 hover:bg-surface-100 dark:hover:bg-surface-800
                 transition-all duration-200
-              ">
-                <Settings className="h-3 w-3" />
-                Preferences
-              </button>
-            </div>
+              "
+            >
+              <Settings className="h-3.5 w-3.5" />
+              Preferences
+            </Link>
           </div>
-        )}
+        </div>
       </div>
     </>
   );
